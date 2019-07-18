@@ -1,4 +1,3 @@
-from tensorflow.python.keras.datasets import *
 from keras import activations
 from keras import optimizers
 from keras import losses
