@@ -1,4 +1,3 @@
-from tensorflow.python.keras.datasets import *
 from keras import activations
 from keras import optimizers
 from keras import losses
@@ -12,56 +11,66 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import tensorflow as tf
 import json
+from math import *
 import dataset
 
 WIDTH = 340
 HEIGHT = 425
 CHANNEL = 3
+BATCH_SIZE = 40
+STEPS_PER_EPOCH = 0
+EPOCHS = 30
 
 
-def race_model():
+def race_model(num_classes):
+    model_name = 'mdl_binent_sgd_test_dataset'
     model = Sequential()
     # model.add(Flatten(input_shape=( WIDTH, HEIGHT, CHANNEL)))
     model.add(InputLayer(input_shape=(HEIGHT, WIDTH, 3,)))
     # model.add(Reshape(target_shape=(10, HEIGHT, WIDTH, CHANNEL)))
-    model.add(Conv2D(filters=16, kernel_size=5, strides=1, padding='same', activation='relu'))
+    model.add(Conv2D(filters=16, kernel_size=5, strides=1, padding='same', activation='relu', name="Conv2D_16f"))
     model.add(MaxPool2D(pool_size=5, padding='same'))
 
-    model.add(Conv2D(filters=24, kernel_size=5, strides=1, padding='same', activation='relu'))
+    model.add(Conv2D(filters=32, kernel_size=5, strides=1, padding='same', activation='relu', name="Conv2D_32f"))
     model.add(MaxPool2D(pool_size=5, padding='same'))
 
-    model.add(Conv2D(filters=32, kernel_size=5, strides=1, padding='same', activation='relu'))
+    model.add(Conv2D(filters=64, kernel_size=5, strides=1, padding='same', activation='relu', name="Conv2D_64f"))
     model.add(MaxPool2D(pool_size=5, padding='same'))
 
-    model.add(Dropout(0.25))
+    model.add(Dropout(0.1, name="Dropout_0.1"))
     model.add(Flatten())
-    model.add(Dense(512, activation=activations.relu))
-    model.add(Dropout(rate=0.5))
-    model.add(Dense(2, activation=activations.softmax))
-    optimizer = optimizers.Adam(lr=1e-3)
+    model.add(Dense(512, activation=activations.relu, name="Dense_Relu"))
+    model.add(Dropout(rate=0.2, name="Dropout_0.2"))
+    model.add(Dense(num_classes, activation=activations.softmax, name=f"Dense_{num_classes}_softmax"))
+    model.add(Dense(1, activation=activations.sigmoid, name="Dense_sigmoid"))
+    # optimizer = optimizers.Adam(lr=1e-3)
+    optimizer = optimizers.SGD(lr=1e-3, decay=0.1, momentum=0.9)
     loss = losses.binary_crossentropy
     model.compile(loss=loss, optimizer=optimizer, metrics=['accuracy'])
-    return model
+    return model, model_name
 
 
 def main():
-    x_train, y_train, races = dataset.load_dataset()
-    x_train = x_train / 255.
-    print(y_train)
-    print(races)
+
     # plt.figure(figsize=(500, 500))
     # plt.imshow(x_train[5])
     # plt.show()
+    train_ds, test_ds, races, train_amount, test_amount = dataset.load_dataset_tf()
+    train_ds = train_ds.shuffle(1200).repeat().batch(BATCH_SIZE)
+    test_ds = test_ds.shuffle(test_amount).repeat().batch(BATCH_SIZE)
+    STEPS_PER_EPOCH = ceil(train_amount/BATCH_SIZE)
 
-    model_name = 'mdl_binent_adam_test'
-    # for image in image_ds.take(1):
-    #     print(image)
-    model = race_model()
+    # for rnum in enumerate(my_ds.take(1)):
+    model, model_name = race_model(len(races))
     model.summary()
     tb_callback = TensorBoard('../logs/' + model_name)
-    model.fit(x_train, y_train, epochs=100, callbacks=[tb_callback])
+    model.fit(train_ds, epochs=5, steps_per_epoch=STEPS_PER_EPOCH, callbacks=[tb_callback])
     plot_model(model, '../models/' + model_name + '.png', show_shapes=True, show_layer_names=True)
-    model.save('./models/' + model_name)
+    model.save('../models/' + model_name)
+    test_loss, test_acc = model.evaluate(test_ds, steps=ceil(test_amount/BATCH_SIZE))
+
+    print('Test accuracy:', test_acc)
+    # predictions = model.predict(test_ds)
 
 
 # tf.enable_eager_execution()

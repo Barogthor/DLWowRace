@@ -2,5 +2,7 @@
 logs/
 models/
 res/*
+!res/dataset.json
 wqazer.py
 old.main.py
+src/__pycache__/
