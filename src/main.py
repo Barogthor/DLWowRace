@@ -24,30 +24,31 @@ EPOCHS = 30
 
 
 def race_model(num_classes):
+    model_name = 'mdl_binent_sgd_test_dataset'
     model = Sequential()
     # model.add(Flatten(input_shape=( WIDTH, HEIGHT, CHANNEL)))
     model.add(InputLayer(input_shape=(HEIGHT, WIDTH, 3,)))
     # model.add(Reshape(target_shape=(10, HEIGHT, WIDTH, CHANNEL)))
-    model.add(Conv2D(filters=16, kernel_size=5, strides=1, padding='same', activation='relu'))
+    model.add(Conv2D(filters=16, kernel_size=5, strides=1, padding='same', activation='relu', name="Conv2D_16f"))
     model.add(MaxPool2D(pool_size=5, padding='same'))
 
-    model.add(Conv2D(filters=32, kernel_size=5, strides=1, padding='same', activation='relu'))
+    model.add(Conv2D(filters=32, kernel_size=5, strides=1, padding='same', activation='relu', name="Conv2D_32f"))
     model.add(MaxPool2D(pool_size=5, padding='same'))
 
-    model.add(Conv2D(filters=64, kernel_size=5, strides=1, padding='same', activation='relu'))
+    model.add(Conv2D(filters=64, kernel_size=5, strides=1, padding='same', activation='relu', name="Conv2D_64f"))
     model.add(MaxPool2D(pool_size=5, padding='same'))
 
-    model.add(Dropout(0.1))
+    model.add(Dropout(0.1, name="Dropout_0.1"))
     model.add(Flatten())
-    model.add(Dense(512, activation=activations.relu))
-    model.add(Dropout(rate=0.2))
-    model.add(Dense(num_classes, activation=activations.softmax))
-    model.add(Dense(1, activation=activations.sigmoid))
+    model.add(Dense(512, activation=activations.relu, name="Dense_Relu"))
+    model.add(Dropout(rate=0.2, name="Dropout_0.2"))
+    model.add(Dense(num_classes, activation=activations.softmax, name=f"Dense_{num_classes}_softmax"))
+    model.add(Dense(1, activation=activations.sigmoid, name="Dense_sigmoid"))
     # optimizer = optimizers.Adam(lr=1e-3)
-    optimizer = optimizers.SGD(lr=1e-3, decay=0.1)
-    loss = losses.categorical_crossentropy
+    optimizer = optimizers.SGD(lr=1e-3, decay=0.1, momentum=0.9)
+    loss = losses.binary_crossentropy
     model.compile(loss=loss, optimizer=optimizer, metrics=['accuracy'])
-    return model
+    return model, model_name
 
 
 def main():
@@ -59,9 +60,9 @@ def main():
     train_ds = train_ds.shuffle(1200).repeat().batch(BATCH_SIZE)
     test_ds = test_ds.shuffle(test_amount).repeat().batch(BATCH_SIZE)
     STEPS_PER_EPOCH = ceil(train_amount/BATCH_SIZE)
-    model_name = 'mdl_catent_sgd_test_dataset'
+
     # for rnum in enumerate(my_ds.take(1)):
-    model = race_model(len(races))
+    model, model_name = race_model(len(races))
     model.summary()
     tb_callback = TensorBoard('../logs/' + model_name)
     model.fit(train_ds, epochs=5, steps_per_epoch=STEPS_PER_EPOCH, callbacks=[tb_callback])
