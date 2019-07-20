@@ -5,8 +5,8 @@ import tensorflow as tf
 from PIL import Image
 import numpy as np
 
-WIDTH = 340
-HEIGHT = 425
+WIDTH = 226
+HEIGHT = 283
 CHANNEL = 3
 RES_PATH = os.path.join('..', 'res')
 JSON_PATH = os.path.join(RES_PATH, "dataset.json")

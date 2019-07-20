@@ -1,11 +1,13 @@
+import numpy as np
 from keras import activations
 from keras import optimizers
 from keras import losses
 from tensorflow.python.keras.layers import *
 from tensorflow.python.keras.models import *
+import math
 
-WIDTH = 340
-HEIGHT = 425
+WIDTH = 226
+HEIGHT = 283
 CHANNEL = 3
 
 

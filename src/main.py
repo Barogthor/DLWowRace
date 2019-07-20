@@ -15,12 +15,11 @@ from math import *
 import dataset
 import model
 
-WIDTH = 340
-HEIGHT = 425
+WIDTH = 226
+HEIGHT = 283
 CHANNEL = 3
 BATCH_SIZE = 16
-EPOCHS = 5
-
+EPOCHS = 10
 
 def main():
     train_ds, test_ds, races, train_amount, test_amount = dataset.load_dataset_tf()
