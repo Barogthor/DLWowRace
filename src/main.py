@@ -14,12 +14,8 @@ import json
 from math import *
 import dataset
 import model
+from constant import *
 
-WIDTH = 226
-HEIGHT = 283
-CHANNEL = 3
-BATCH_SIZE = 16
-EPOCHS = 10
 
 def main():
     train_ds, test_ds, races, train_amount, test_amount = dataset.load_dataset_tf()
@@ -27,7 +23,7 @@ def main():
     test_ds = test_ds.shuffle(test_amount).repeat().batch(BATCH_SIZE)
     steps_per_epoch = ceil(train_amount / BATCH_SIZE)
 
-    mdl, model_name = model.race_model_test2b(len(races))
+    mdl, model_name = model.race_model_res_net_1(len(races))
     mdl.summary()
     if 1:
         tb_callback = TensorBoard('../logs/' + model_name)
