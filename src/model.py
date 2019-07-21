@@ -10,7 +10,7 @@ from constant import *
 
 
 def race_model_res_net_1(num_classes):
-    model_name = 'resnet_adam_catent_section_4'
+    model_name = 'resnet_sgd_spcatent_section_4_max'
 
     input_tensor = Input((HEIGHT, WIDTH, 3,))
 
@@ -19,13 +19,13 @@ def race_model_res_net_1(num_classes):
     right_layer = right_layers(input_tensor, num_classes)
     head_layer = head_layers(input_tensor, num_classes)
 
-    rslt = Average()([left_layer, body_layer, right_layer, head_layer])
+    rslt = Maximum()([left_layer, body_layer, right_layer, head_layer])
 
     # rslt = Dense(128, activation=activations.relu)(rslt)
     # rslt = Dense(num_classes, activation=activations.softmax, name=f"Dense_{num_classes}_classes")(rslt)
     # rslt = Dense(1, activation=activations.sigmoid)(rslt)
     model = Model([input_tensor], [rslt])
-    model.compile(loss=losses.categorical_crossentropy, optimizer=optimizers.adam(), metrics=['accuracy'])
+    model.compile(loss=losses.sparse_categorical_crossentropy, optimizer=optimizers.sgd(), metrics=['accuracy'])
     return model, model_name
 
 
@@ -120,21 +120,18 @@ def race_model_test2(num_classes):
 
 
 def race_model_test(num_classes):
-    model_name = 'mdl_binent_sgd_test_dataset'
+    model_name = 'mdl_binent_sgd_test_lazydataset'
     model = Sequential()
     # model.add(Flatten(input_shape=( WIDTH, HEIGHT, CHANNEL)))
     model.add(InputLayer(input_shape=(HEIGHT, WIDTH, 3,)))
     # model.add(Reshape(target_shape=(10, HEIGHT, WIDTH, CHANNEL)))
-    model.add(Conv2D(filters=16, kernel_size=5, strides=1, padding='same', activation='relu', name="Conv2D_16f"))
-    model.add(MaxPool2D(pool_size=5, padding='same'))
-
-    model.add(Conv2D(filters=32, kernel_size=5, strides=1, padding='same', activation='relu', name="Conv2D_32f"))
-    model.add(MaxPool2D(pool_size=5, padding='same'))
+    model.add(Conv2D(filters=32, kernel_size=5, strides=1, padding='same', activation='relu', name="Conv2D_16f"))
+    model.add(MaxPool2D(pool_size=4, padding='same'))
 
     model.add(Conv2D(filters=64, kernel_size=5, strides=1, padding='same', activation='relu', name="Conv2D_64f"))
-    model.add(MaxPool2D(pool_size=5, padding='same'))
+    model.add(MaxPool2D(pool_size=3, padding='same'))
 
-    model.add(Dropout(0.1, name="Dropout_0.1"))
+    model.add(Dropout(0.3, name="Dropout_0.3"))
     model.add(Flatten())
     model.add(Dense(512, activation=activations.relu, name="Dense_Relu"))
     model.add(Dropout(rate=0.2, name="Dropout_0.2"))

@@ -42,14 +42,14 @@ def merge_section(tensors):
 
 def head_layers(input_tensor, num_classes):
     head_layer = Lambda(head_section, name="Cut_head_section")(input_tensor)
-    head_layer = Conv2D(32, kernel_size=5, strides=1, padding='same', activation='relu',
+    head_layer = Conv2D(32, kernel_size=5, strides=2, padding='same', activation='relu',
                         name="Conv2D_64f_head")(head_layer)
-    head_layer = AveragePooling2D(pool_size=5, padding='same')(head_layer)
+    head_layer = AveragePooling2D(pool_size=3, padding='same')(head_layer)
     head_layer = Dropout(0.25)(head_layer)
     head_layer = Flatten()(head_layer)
-    head_layer = Dense(256, activation=activations.linear, name="Dense_256_head")(head_layer)
+    head_layer = Dense(384, activation=activations.linear, name="Dense_384_head")(head_layer)
     head_layer = LeakyReLU(name="LeakyReLU_head")(head_layer)
-    head_layer = Dense(128, activation=activations.sigmoid, name="Dense_128_sigmoid_head")(head_layer)
+    head_layer = Dense(192, activation=activations.sigmoid, name="Dense_192_sigmoid_head")(head_layer)
     head_layer = Dense(num_classes, activation=activations.softmax, name=f"Dense_{num_classes}_classes_head")(
         head_layer)
     return head_layer
@@ -57,14 +57,14 @@ def head_layers(input_tensor, num_classes):
 
 def body_layers(input_tensor, num_classes):
     body_layer = Lambda(body_section, name="Cut_body_section")(input_tensor)
-    body_layer = Conv2D(32, kernel_size=5, strides=1, padding='same', activation='relu',
+    body_layer = Conv2D(32, kernel_size=5, strides=2, padding='same', activation='relu',
                         name="Conv2D_64f_body")(body_layer)
-    body_layer = AveragePooling2D(pool_size=5, padding='same')(body_layer)
+    body_layer = AveragePooling2D(pool_size=3, padding='same')(body_layer)
     body_layer = Dropout(0.25)(body_layer)
     body_layer = Flatten()(body_layer)
-    body_layer = Dense(256, activation=activations.linear, name="Dense_256_body")(body_layer)
+    body_layer = Dense(512, activation=activations.linear, name="Dense_512_body")(body_layer)
     body_layer = LeakyReLU(name="LeakyReLU_body")(body_layer)
-    body_layer = Dense(128, activation=activations.sigmoid, name="Dense_256_sigmoid_body")(body_layer)
+    body_layer = Dense(256, activation=activations.sigmoid, name="Dense_256_sigmoid_body")(body_layer)
     body_layer = Dense(num_classes, activation=activations.softmax, name=f"Dense_{num_classes}_classes_body")(
         body_layer)
     return body_layer
@@ -72,9 +72,9 @@ def body_layers(input_tensor, num_classes):
 
 def left_layers(input_tensor, num_classes):
     left_arm_layer = Lambda(left_arm_section, name="Cut_left_arm_section")(input_tensor)
-    left_arm_layer = Conv2D(32, kernel_size=5, strides=1, padding='same', activation='relu',
+    left_arm_layer = Conv2D(32, kernel_size=5, strides=3, padding='same', activation='relu',
                             name="Conv2D_64f_left")(left_arm_layer)
-    left_arm_layer = AveragePooling2D(pool_size=5, padding='same')(left_arm_layer)
+    left_arm_layer = AveragePooling2D(pool_size=2, padding='same')(left_arm_layer)
     left_arm_layer = Dropout(0.25)(left_arm_layer)
     left_arm_layer = Flatten()(left_arm_layer)
     left_arm_layer = Dense(128, activation=activations.linear, name="Dense_128_left")(left_arm_layer)
@@ -87,9 +87,9 @@ def left_layers(input_tensor, num_classes):
 
 def right_layers(input_tensor, num_classes):
     right_arm_layer = Lambda(right_arm_section, name="Cut_right_arm_section")(input_tensor)
-    right_arm_layer = Conv2D(32, kernel_size=5, strides=1, padding='same', activation='relu',
+    right_arm_layer = Conv2D(32, kernel_size=5, strides=3, padding='same', activation='relu',
                              name="Conv2D_64f_right")(right_arm_layer)
-    right_arm_layer = AveragePooling2D(pool_size=5, padding='same')(right_arm_layer)
+    right_arm_layer = AveragePooling2D(pool_size=2, padding='same')(right_arm_layer)
     right_arm_layer = Dropout(0.25)(right_arm_layer)
     right_arm_layer = Flatten()(right_arm_layer)
     right_arm_layer = Dense(128, activation=activations.linear, name="Dense_128_right")(right_arm_layer)

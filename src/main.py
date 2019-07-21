@@ -10,7 +10,7 @@ from tensorflow.python.keras.utils.vis_utils import plot_model
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import tensorflow as tf
-import json
+import time
 from math import *
 import dataset
 import model
@@ -23,6 +23,7 @@ def main():
     test_ds = test_ds.shuffle(test_amount).repeat().batch(BATCH_SIZE)
     steps_per_epoch = ceil(train_amount / BATCH_SIZE)
 
+    # mdl, model_name = model.race_model_res_net_1(len(races))
     mdl, model_name = model.race_model_res_net_1(len(races))
     mdl.summary()
     if 1:
@@ -39,7 +40,10 @@ def main():
 
 # tf.enable_eager_execution()
 if __name__ == "__main__":
+    start_time = time.time()
     main()
+    deltatime = round(time.time() - start_time, 2)
+    print(f"--- {floor(deltatime/60)}min {floor(deltatime)%60}s ---")
 
 # plt.figure(figsize=(500, 500))
 # plt.imshow(x_train[5])
